@@ -5,49 +5,48 @@ class ProgramState:
 			input = input + ';'
 		return input
 	def var_Initialize(self,line):
-		tag = []
+		tags = []
+		class_type = search("{:w}->",line).fixed[0]
 		for r in findall("->{:w}",line):
-			tag.append(r.fixed[0])
-		return tag
-
+			tags.append(r.fixed[0])
+		type = tags[0]
+		if "pointer" in class_type:
+			type += '*'
+		if "array" in class_type:
+			size = search("[{}]",line).fixed[0]
+			array = True
+		else:
+			array = False
+		for tag in tags:
+			line = line.replace(type,"")
+		line = line.replace("var->","")
+		line = line.replace("pointer->","")
+		line = line.replace("array->","")
+		line = line.replace("["+search("[{}]",line).fixed[0]+"]","")
+		if array:
+			return type + line + "[" + size + "]"
+		else:
+			return type + line
+		
 	def __init__(self,name):
 		self.variables = []
 		self.error = False
 		self.name = name
-def append_semicolon(input):
-	if input[-1] != ';':
-		input = input + ';'
-	return input	
+	
 	
 def isInitialization(line_input,state):
-	"""
-	TODO
-	Make sure to seperate initialization part from declaration part
-	Parse string before/after "=" sign
-	Also modulate following code into functions
-	Deadline: Saturday, November 19, 2016
-	(Good luck to myself)
-	"""
-	tags = state.var_Initialize(line_input)
-	type = tags[0]
-	if "pointer" in line_input:
-		type += '*'
-	if "array" in line_input:
-		size = search("[{}]",line_input).fixed[0]
-		array = True
-	else:
-		array = False
-	for tag in tags:
-		line_input = line_input.replace(type,"")
-	line_input = line_input.replace("var->","")
-	line_input = line_input.replace("pointer->","")
-	line_input = line_input.replace("array->","")
-	line_input = line_input.replace("["+search("[{}]",line_input).fixed[0]+"]","")
-	line_input = append_semicolon(line_input)
-	if array:
-		return type + line_input + "[" + size + "]"
-	else:
-		return type + line_input
+	parts = line_input.split("=") #split it at the equals sign
+	initialization = ""
+	declaration = parts[0]
+	if len(parts) > 1: 
+		initialization = parts[1]
+	
+	declaration = state.var_Initialize(declaration)
+	
+	return state.append_semicolon(declaration + "=" + initialization)
+	
+	
+
 
 def parsed(input,state):
 	if search("var->",input) != None or search("pointer->",input) != None or search("array->",input) != None:
@@ -59,7 +58,7 @@ def parsed(input,state):
 	deadline: 
 	"""
 	
-print "Welcome to the B compiler!"
+print "Welcome to the A-C++ compiler!"
 print "Enter a line to compile it!"
 line_input = raw_input()
 ps = ProgramState("")
