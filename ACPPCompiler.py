@@ -1,32 +1,48 @@
 from parse import *
+
+def getSymbol(type):
+	if type == 'pointer':
+		return '*'
+	if type == 'reference':
+		return '&'
+	return ''
 class ProgramState:
+
 	def append_semicolon(self,input):
 		if input[-1] != ';':
 			input = input + ';'
 		return input
-	def var_Initialize(self,line):
-		tags = []
-		class_type = search("{:w}->",line).fixed[0]
-		for r in findall("->{:w}",line):
-			tags.append(r.fixed[0])
+		
+		
+	def varInitialize(self,line):
+		tags = [] #holds all tags for type
+		array = False #for later...
+		
+		for r in findall("{:w}->",line):
+			tags.append(r.fixed[0]) #appending tags
+		if len(tags) == 0:
+			self.error = True
+			print "Error... no type! Please assign a type to the variables."
+			return ""
 		type = tags[0]
-		if "pointer" in class_type:
-			type += '*'
-		if "array" in class_type:
-			size = search("[{}]",line).fixed[0]
-			array = True
-		else:
-			array = False
+		tags.remove(type)
 		for tag in tags:
-			line = line.replace(type,"")
-		line = line.replace("var->","")
-		line = line.replace("pointer->","")
-		line = line.replace("array->","")
-		line = line.replace("["+search("[{}]",line).fixed[0]+"]","")
-		if array:
-			return type + line + "[" + size + "]"
+			type += getSymbol(tag)
+			if tag == 'array':
+				array = True
+		
+		name = ""
+		if search("->{:w} ",line) == None:
+			self.error = True
+			print "Error... you have no name for your variable."
+			return ""
 		else:
-			return type + line
+			name = search("->{:w} ",line).fixed[0]
+		if array:
+			line = line.replace("["+search("[{}]",line).fixed[0]+"]","")
+			return type + " " + name + "[" + size + "]"
+		else:
+			return type + " " + name
 		
 	def __init__(self,name):
 		self.variables = []
@@ -41,9 +57,11 @@ def isInitialization(line_input,state):
 	if len(parts) > 1: 
 		initialization = parts[1]
 	
-	declaration = state.var_Initialize(declaration)
-	
-	return state.append_semicolon(declaration + "=" + initialization)
+	declaration = state.varInitialize(declaration)
+	if '=' in line_input:
+		return state.append_semicolon(declaration + " = " + initialization)
+	else:
+		return state.append_semicolon(declaration + initialization)
 	
 	
 
@@ -62,4 +80,5 @@ print "Welcome to the A-C++ compiler!"
 print "Enter a line to compile it!"
 line_input = raw_input()
 ps = ProgramState("")
+print ps.varInitialize(line_input)
 print parsed(line_input,ps)
