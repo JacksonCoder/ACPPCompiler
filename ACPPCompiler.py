@@ -1,8 +1,5 @@
 from functionparse import *
 
-	
-
-
 def parsed(input):
 	if "define" in input:
 		return functionParse(input)

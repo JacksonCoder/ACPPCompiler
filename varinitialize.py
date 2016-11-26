@@ -30,11 +30,11 @@ def varInitialize(line):
 			array = True
 		
 	name = ""
-	if search("->{:w} ",line) == None:
+	if search("->{:w}",line) == None:
 		print "Error... you have no name for your variable."
 		return ""
 	else:
-		name = search("->{:w} ",line).fixed[0]
+		name = search("->{:w}",line).fixed[0]
 	if array:
 		line = line.replace("["+search("[{}]",line).fixed[0]+"]","")
 		return type + " " + name + "[" + size + "]"
