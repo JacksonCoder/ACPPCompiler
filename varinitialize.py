@@ -1,11 +1,4 @@
 from parse import *
-def getSymbol(type):
-	if type == 'pointer':
-		return '*'
-	if type == 'reference':
-		return '&'
-	return ''
-
 
 def append_semicolon(input):
 	if input[-1] != ';':
@@ -14,8 +7,8 @@ def append_semicolon(input):
 		
 		
 def varInitialize(line):
-	tags = [] #holds all tags for type
-	array = False #for later...
+	tags = [] #used for templates
+	array = False #boolean variable
 	
 	for r in findall("{:w}->",line):
 		tags.append(r.fixed[0]) #appending tags
@@ -25,7 +18,6 @@ def varInitialize(line):
 	type = tags[0]
 	tags.remove(type)
 	for tag in tags:
-		type += getSymbol(tag)
 		if tag == 'array':
 			array = True
 		
@@ -34,12 +26,19 @@ def varInitialize(line):
 		print "Error... you have no name for your variable."
 		return ""
 	else:
-		name = search("->{:w}",line).fixed[0]
-	if array:
-		line = line.replace("["+search("[{}]",line).fixed[0]+"]","")
-		return type + " " + name + "[" + size + "]"
-	else:
-		return type + " " + name
+            lastobjectlist = []
+            lastobjectiterator = findall("->{:w}",line)
+            for lo in lastobjectiterator:
+                lastobjectlist.append(lo)
+            name = lastobjectlist[-1].fixed[0]
+	
+        #if supported("array") #add later, when supported function is added
+        type = "std::vector"
+        for tag in tags: #handles templatizing parameters
+            type += "<" + tag
+        for tag in tags:
+            type += " >"
+	return type + " " + name
 	
 	
 def isInitialization(line_input):
