@@ -24,4 +24,13 @@ def whileLoop(line):
     return "while (" + argvalue + "){"
 def forLoop(line):
     if search("for {},{},{}",line) != None:
+       pass
         #do for loop regular stuff
+    #basic checking here
+    if "if" not in line:
+        print "Error... this shouldn't have happened"
+    #get boolean argument
+    argvalue = search("if {}",line)
+    if argvalue == None:
+        print "Error... 'if' function needs a argument"
+    return "if (" + argvalue + "){"
