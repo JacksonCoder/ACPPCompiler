@@ -1,9 +1,20 @@
 from parse import *
 from tokenparser import *
+from arglist import *
 #from typeclass import *
 import re
-def isTypeToken(string,pos):
-    #check to make sure it is a valid type... later
-    #do checks here: no regex implemented currently
-    #no checks nessecary: This should be at the base of the checking tree, but check for () parenthesis
+def isDeclaration(string):
+    result = parse("{:w}:{} = {}",string)
+    if result == None:
+        result = parse("{:w}:{}",string)
+        if result == None:
+            return False
+    return True
+def isTypeToken(string):
+    result = parse("({}){}",string).fixed
+    if result == None:
+        result = [string]
+        return result
+    else:
+        return ' '.join(','.join(arglistParse(result[0]))) + result[1]
     
