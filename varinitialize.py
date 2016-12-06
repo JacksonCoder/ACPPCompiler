@@ -1,8 +1,5 @@
 from parse import *
-from tokenparser import *
-from arglist import *
-#from typeclass import *
-import re
+import tokenparser as tp
 def isDeclaration(string):
     result = parse("{:w}:{} = {}",string)
     if result == None:
@@ -10,7 +7,20 @@ def isDeclaration(string):
         if result == None:
             return False
     return True
-def isTypeToken(string):
+def declarationParse(string):
+    result = parse("{:w}:{} = {}",string)
+    if result == None:
+        result = parse("{:w}:({}){}<{}>",string)
+        if result == None: # no internal AND templatized parameters
+            result = parse("{:w}:({}){}",string)
+            if result == None: #no internal parameters
+                result = parse("{:w}:{}<{}>",string)
+                if result == None: #just var declaration
+                    result = parse("{:w}:{}",string)
+                    name = result.fixed[0]
+                    vartype = result.fixed[1]
+                    return tp.Token(vartype + ' ' + name,"dec")
+def isType(string):
     result = parse("({}){}",string).fixed
     if result == None:
         result = [string]

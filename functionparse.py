@@ -1,16 +1,23 @@
-from varinitialize import *
-from arglist import *
-
-def isFunctionDef(line):
+import arglist
+from parse import *
+import tokenparser as tp
+def isFunctionDefwithArgs(line):
     result =  parse("define {:w}({}) {:w}",line)
     if result == None:
         return False
     return True
-    
+def isFunctionDefwithoutArgs(line):
+    result =  parse("define {:w}() {:w}",line)
+    if result == None:
+        return False
+    return True
 def functionParse(line):
     vars = parse("define {:w}({}) {}",line)
     name = vars.fixed[0]
     typename = vars.fixed[2]
-    #parse argument list
-    parsed_argument_list = arglistParse(line)
-    return typename+" " + name + "("+ passed_argument_list  + "){"
+    return tp.Token(typename+" " + name + "("+ arglist.arglistParse(vars.fixed[1])  + "){","funcwa")
+def functionParsenoArgs(line): 
+    vars = parse("define {:w}({}) {}",line)
+    name = vars.fixed[0]
+    typename = vars.fixed[2]
+    return typename+" " + name + "("+ arglist.arglistParse(vars.fixed[1])  + "){"
