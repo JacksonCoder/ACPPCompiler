@@ -10,7 +10,7 @@ def isInlineIfStatement(string):
     if result == None:
         return False
     return True
-def ifStatementParse(string)
+def ifStatementParse(string):
     result = parse("if {}")
     boolean_value = result.fixed[0]
     return tp.Token(

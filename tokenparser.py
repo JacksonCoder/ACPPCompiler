@@ -1,6 +1,7 @@
 from loopparser import *
 import varinitialize as vi
 import functionparse as fp
+import variousparsetools as vpt
 class PositionInfo:
    def  __init__(self):
         self.line = 0 #line number
@@ -20,9 +21,13 @@ def parseToken(line):
         return fp.functionParsenoArgs(line)
     if vi.isDeclaration(line):
         return vi.declarationParse(line)
-    return line
-'''
-    if vi.isType(line):
+    
+    if vpt.isInlineIfStatement(line):
 
-        return vi.typeParse(line)
-'''
+        return vpt.inlineIfStatementParse(line)
+
+    if vpt.isIfStatement(line):
+
+        return vpt.ifStatementParse(line)
+
+    return line
