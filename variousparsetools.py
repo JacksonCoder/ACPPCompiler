@@ -22,7 +22,7 @@ def isInlineIfStatement(string):
 
     return True
 
-def ifStatementParse(string)
+def ifStatementParse(string):
 
     result = parse("if {}")
 

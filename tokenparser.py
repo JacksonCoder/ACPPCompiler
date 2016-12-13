@@ -34,7 +34,10 @@ def parseToken(line):
 
         return vi.declarationParse(line)
 
-    return line
+    return Token(
+            line,
+            'name'
+            )
 
 '''
 
