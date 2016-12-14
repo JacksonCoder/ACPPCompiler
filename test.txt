@@ -1,0 +1,5 @@
+define e(j:int) void
+	v
+	J:int
+ 		J:int
+	 
