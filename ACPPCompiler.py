@@ -1,24 +1,7 @@
 import tokenparser as tp
 
-#Main controller
 
-class ParseController:
 
-    #This is the subcontainer with all the file parse functions and the arrays of internal data
-
-    def __init__(self):
-
-        pass
-
-    def processLine(self,line):
-
-        token = tp.parseToken(line)
-
-       # if token.type != 'func':
-
-        #    token.string += ';'
-
-        return token
 
 class Module:
 
@@ -37,23 +20,29 @@ class Module:
         self.parsedcontents = []
 
     def createSubModule(self,mod,place):
+    	print 'creating sm!'
 
         self.submodules.append(mod)
-
+        #print self.submodules[len(self.submodules)-1]
+		
         self.submodulespaces[place] = mod
-
         self.submodules[len(self.submodules)-1].parentmodule = self
 
     def internalParse(self):
-        print len(self.contents)
+        print 'called'
         for i in range(0,len(self.contents)):
+        
             line = self.contents[i]
-            print line
+            
             if i in self.submodulespaces:
                 
-                self.submodules = self.submodulespaces[i].internalParse()
+                old_state = self.submodulespaces[i]
+                
+                self.submodulespaces[i].internalParse()
+                
+                self.submodules[self.submodules.index(old_state)] = self.submodulespaces[i]
 
-                self.parsedcontents.append(self.submodules[i].parsedcontents)
+                self.parsedcontents.append(self.submodules[self.submodules.index(old_state)].parsedcontents)
 
             parsedline = tp.parseToken(line)
 
@@ -62,7 +51,6 @@ class Module:
                 parsedline += ';' #can't forget that semicolon!
 
             self.parsedcontents.append(parsedline.string)
-        return self
 
 print "What file do you want to read from?"
 
@@ -90,26 +78,45 @@ def makeModule(linelist,tabnumber):
 
             tabnumber += 1
             
-            internaliterator = 0
+            print linelist[i]
+            
+            internaliterator = i
             
             subparsed = []
-            print 'in1'
-
+            
+            subparsed.append(linelist[i])
+            
             while linelist[internaliterator].count('\t') >= tabnumber:
+            
 
+                
                 subparsed.append(linelist[internaliterator] + '\n')
 
                 returnmodule.contents.pop(internaliterator) #This removes contents that are implemented in a submodule
+                       
                 internaliterator += 1
-            print 'in'
+
+                
+            
             returnmodule.createSubModule(makeModule(subparsed,tabnumber),internaliterator)
+            
             if linelist[internaliterator].count('\t') < tabnumber-1:
+            
                 return returnmodule
+                
             i = internaliterator
+            
         i += 1
+        
     print returnmodule.contents
+    
     return returnmodule
+    
 mod = makeModule(linelist,0)
+
 mod.internalParse()
-print mod.submodules
-print '\n'.join(mod.parsedcontents)
+
+print mod.submodulespaces
+
+print mod.parsedcontents
+
