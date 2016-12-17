@@ -29,27 +29,28 @@ class Module:
         self.submodules[len(self.submodules)-1].parentmodule = self
 
     def internalParse(self):
-        print 'called'
+        print self.submodulespaces
         for i in range(0,len(self.contents)):
-        
             line = self.contents[i]
             
-            if i in self.submodulespaces:
+            if self.contents[i-1] in self.submodulespaces and i - 1 > -1:
                 
-                old_state = self.submodulespaces[i]
+                old_state = self.submodulespaces[self.contents[i-1]]
                 
-                self.submodulespaces[i].internalParse()
+                self.submodulespaces[self.contents[i-1]].internalParse()
                 
-                self.submodules[self.submodules.index(old_state)] = self.submodulespaces[i]
-
-                self.parsedcontents.append(self.submodules[self.submodules.index(old_state)].parsedcontents)
+                self.submodules[self.submodules.index(old_state)] = self.submodulespaces[self.contents[i-1]]
+                
+                print self.submodules[self.submodules.index(old_state)].parsedcontents
+                for a in self.submodules[self.submodules.index(old_state)].parsedcontents:
+                	self.parsedcontents.append(a)
 
             parsedline = tp.parseToken(line)
-
+            '''
             if parsedline.tokentype == 'dec' or parsedline.tokentype == 'funccall' or parsedline.tokentype == 'assign':
 
                 parsedline += ';' #can't forget that semicolon!
-
+            '''
             self.parsedcontents.append(parsedline.string)
 
 print "What file do you want to read from?"
@@ -68,47 +69,34 @@ linelist = contents.split('\n')
 
 def makeModule(linelist,tabnumber):
 
-    i = 0
+    i = 0 #used as our primary list iterator
     
-    returnmodule = Module(linelist)
+    returnmodule = Module([]) #The module that is returned by this recursive sequence
 
-    while i < len(linelist)-1:
+    while i < len(linelist): 
 
         if linelist[i].count('\t') > tabnumber:
-
-            tabnumber += 1
-            
-            print linelist[i]
-            
+            tabnumber += 1 #passed recursively
+            position = returnmodule.contents[-1]
             internaliterator = i
             
             subparsed = []
             
             subparsed.append(linelist[i])
-            
-            while linelist[internaliterator].count('\t') >= tabnumber:
-            
-
-                
-                subparsed.append(linelist[internaliterator] + '\n')
-
-                returnmodule.contents.pop(internaliterator) #This removes contents that are implemented in a submodule
+            while linelist[internaliterator].count('\t') >= tabnumber and internaliterator < len(linelist)-1:
                        
                 internaliterator += 1
+                subparsed.append(linelist[internaliterator])
 
-                
+            subparsed.pop()
+            returnmodule.createSubModule(makeModule(subparsed,tabnumber),position)
             
-            returnmodule.createSubModule(makeModule(subparsed,tabnumber),internaliterator)
-            
-            if linelist[internaliterator].count('\t') < tabnumber-1:
-            
-                return returnmodule
-                
             i = internaliterator
-            
+            returnmodule.contents.append(linelist[i])
+    	else: returnmodule.contents.append(linelist[i])
         i += 1
         
-    print returnmodule.contents
+    print returnmodule.contents #debug
     
     return returnmodule
     
@@ -116,7 +104,5 @@ mod = makeModule(linelist,0)
 
 mod.internalParse()
 
-print mod.submodulespaces
-
-print mod.parsedcontents
+print '\n'.join(mod.parsedcontents)
 

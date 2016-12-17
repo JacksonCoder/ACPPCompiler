@@ -8,7 +8,7 @@ import variousparsetools
 
 def isFunctionDefwithArgs(line):
 
-    result =  parse("define {:w}({}) {:w}",line)
+    result =  parse("{:w}({}):{:w}",line)
 
     if result == None:
 
@@ -18,7 +18,7 @@ def isFunctionDefwithArgs(line):
 
 def isFunctionDefwithoutArgs(line):
 
-    result =  parse("define {:w}() {:w}",line)
+    result =  parse("{:w}():{:w}",line)
 
     if result == None:
 
@@ -27,8 +27,7 @@ def isFunctionDefwithoutArgs(line):
     return True
 
 def functionParse(line):
-
-    vars = parse("define {:w}({}) {}",line)
+    vars = parse("{:w}({}):{}",line)
 
     name = vars.fixed[0]
 
@@ -38,7 +37,7 @@ def functionParse(line):
 
 def functionParsenoArgs(line): 
 
-    vars = parse("define {:w}({}) {}",line)
+    vars = parse("{:w}({}):{}",line)
 
     name = vars.fixed[0]
 

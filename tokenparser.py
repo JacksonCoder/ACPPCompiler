@@ -4,6 +4,7 @@ import varinitialize as vi
 
 import functionparse as fp
 
+import syntaxcleaner as sc
 class PositionInfo:
 
    def  __init__(self):
@@ -20,22 +21,23 @@ class Token:
 
         self.tokentype = tokentype
 
-def parseToken(line):
+def parseToken(token):
+    token = sc.syntaxClean(token)
+    print 'parsing ' + token
+    if fp.isFunctionDefwithArgs(token):
 
-    if fp.isFunctionDefwithArgs(line):
+        return fp.functionParse(token)
 
-        return fp.functionParse(line)
+    if fp.isFunctionDefwithoutArgs(token):
 
-    if fp.isFunctionDefwithoutArgs(line):
+        return fp.functionParsenoArgs(token)
 
-        return fp.functionParsenoArgs(line)
+    if vi.isDeclaration(token):
 
-    if vi.isDeclaration(line):
-
-        return vi.declarationParse(line)
-
+        return vi.declarationParse(token)
+    print 'returning'
     return Token(
-            line,
+            token,
             'name'
             )
 
