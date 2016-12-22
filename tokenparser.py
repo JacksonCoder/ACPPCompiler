@@ -5,13 +5,19 @@ import varinitialize as vi
 import functionparse as fp
 
 import syntaxcleaner as sc
+
+class ParseLevel:
+	
+	def __init__(self):
+	    
+	    self.types = ['top','front','back','lowest','comment']
+	    
+	    self.type = ''
 class PositionInfo:
 
    def  __init__(self):
 
-        self.line = 0 #line number
-
-        self.type = '' 
+        self.parselevel = ParseLevel()
 
 class Token:
 

@@ -27,7 +27,12 @@ class Module:
 		
         self.submodulespaces[place] = mod
         self.submodules[len(self.submodules)-1].parentmodule = self
-
+    
+    def doModulePreparation(self):
+		self.contents.append('}')
+		for s in self.submodules:
+			s.doModulePreparation()
+	
     def internalParse(self):
         print self.submodulespaces
         for i in range(0,len(self.contents)):
@@ -44,7 +49,7 @@ class Module:
                 print self.submodules[self.submodules.index(old_state)].parsedcontents
                 for a in self.submodules[self.submodules.index(old_state)].parsedcontents:
                 	self.parsedcontents.append(a)
-
+            
             parsedline = tp.parseToken(line)
             '''
             if parsedline.tokentype == 'dec' or parsedline.tokentype == 'funccall' or parsedline.tokentype == 'assign':
@@ -52,6 +57,8 @@ class Module:
                 parsedline += ';' #can't forget that semicolon!
             '''
             self.parsedcontents.append(parsedline.string)
+            
+        self.parsedcontents.append('}')
 
 print "What file do you want to read from?"
 
@@ -101,6 +108,8 @@ def makeModule(linelist,tabnumber):
     return returnmodule
     
 mod = makeModule(linelist,0)
+
+#mod.doModulePreparation()
 
 mod.internalParse()
 
